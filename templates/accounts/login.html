@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | Academic Performance Prediction System</title>
+  <link rel="stylesheet" href="/static/css/sign_in.css">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="wrapper">
+    <div class="form-section">
+      <!-- Logo -->
+      <div class="logo">
+        <img src="/static/images/Logo2.png" alt="Logo">
+      </div>
+
+      <h2>Log in to the system</h2>
+      
+      <!-- Separator -->
+      <div class="separator">
+        <span>or</span>
+      </div>
+
+      <!-- Form -->
+      <form method="post">
+        {% csrf_token %}
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+
+        <button type="submit">Login</button>
+      </form>
+
+      <div class="login-link">
+        Don't have an account? <a href="{% url 'signup' %}">Register</a>
+      </div>
+    </div>
+
+    <div class="illustration-section">
+      <img src="/static/images/Illustration2.png" alt="Illustration">
+    </div>
+  </div>
+</body>
+</html>

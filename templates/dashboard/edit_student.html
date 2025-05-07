@@ -1,0 +1,133 @@
+{% load static dashboard_extras %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Student | {{ student.get_full_name }}</title>
+  <link rel="stylesheet" href="{% static 'css/admin_courses.css' %}" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    .form-container {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      max-width: 700px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    
+    .form-group select[multiple] {
+      height: 150px;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    .button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    
+    .primary-button {
+      background: #605BFF;
+      color: white;
+    }
+    
+    .secondary-button {
+      background: #e0e0e0;
+      color: #333;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- LEFT SIDEBAR -->
+    <article class="menu-container">
+      <div class="menu-header">
+        <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo" />
+        <span class="app-name">Base</span>
+      </div>
+      <nav class="menu-items">
+        <a href="{% url 'dashboard' %}" class="menu-item"><img src="{% static 'images/dashboard2.png' %}" class="icon" /><span>Dashboard</span></a>
+        <a href="{% url 'admin_courses' %}" class="menu-item"><img src="{% static 'images/courses.svg' %}" class="icon" /><span>Courses</span></a>
+        <a href="{% url 'admin_students' %}" class="menu-item"><img src="{% static 'images/students.svg' %}" class="icon" /><span>Students</span></a>
+        <a href="{% url 'settings' %}" class="menu-item"><img src="{% static 'images/setting.png' %}" class="icon" /><span>Settings</span></a>
+      </nav>
+      <div class="menu-footer">
+        <a href="{% url 'logout' %}" class="menu-item logout"><img src="{% static 'images/Logout.png' %}" class="icon" /><span>Logout</span></a>
+      </div>
+    </article>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+      <header class="header">
+        <h1>Edit Student</h1>
+        <p>{{ student.get_full_name }}</p>
+      </header>
+      
+      <div class="form-container">
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="full_name">Full Name</label>
+            <input type="text" id="full_name" name="full_name" value="{{ student.first_name }} {{ student.last_name }}" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="{{ student.email }}" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="student_number">Student ID</label>
+            <input type="text" id="student_number" name="student_number" value="{{ student.student_number }}" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="courses">Courses</label>
+            <select id="courses" name="courses" multiple>
+              {% for course in courses %}
+              <option value="{{ course.id }}" {% if course in student.enrolled_courses.all %}selected{% endif %}>{{ course.name }}</option>
+              {% endfor %}
+            </select>
+            <small style="display: block; margin-top: 5px; color: #666;">Hold Ctrl (Cmd on Mac) to select multiple courses</small>
+          </div>
+          
+          <div class="button-group">
+            <a href="{% url 'admin_students' %}" class="button secondary-button">Cancel</a>
+            <button type="submit" class="button primary-button">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

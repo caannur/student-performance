@@ -1,0 +1,357 @@
+{% load static dashboard_extras %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ course.name }} | Academic Performance Prediction System</title>
+  <link rel="stylesheet" href="{% static 'css/admin_courses.css' %}" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    .tabs {
+      display: flex;
+      background-color: #f5f5f5;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    
+    .tab {
+      padding: 12px 20px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 600;
+    }
+    
+    .tab.active {
+      background-color: #605BFF;
+      color: white;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .action-button {
+      padding: 10px 15px;
+      background: #605BFF;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    
+    .action-button.secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      padding: 15px;
+    }
+    
+    .card h3 {
+      margin-top: 0;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    
+    .card p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+    
+    .status {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .status.upcoming {
+      background: #e0f7fa;
+      color: #0097a7;
+    }
+    
+    .status.active {
+      background: #e8f5e9;
+      color: #388e3c;
+    }
+    
+    .status.completed {
+      background: #f5f5f5;
+      color: #616161;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    
+    table th, table td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    
+    table th {
+      font-weight: 600;
+      color: #555;
+      background: #f8f8f8;
+    }
+    
+    .grade-cell {
+      position: relative;
+    }
+    
+    .grade {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .grade-actions {
+      visibility: hidden;
+    }
+    
+    .grade-cell:hover .grade-actions {
+      visibility: visible;
+    }
+    
+    .grade-button {
+      background: #e0e0ff;
+      color: #605BFF;
+      border: none;
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- LEFT SIDEBAR -->
+    <article class="menu-container">
+      <div class="menu-header">
+        <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo" />
+        <span class="app-name">Base</span>
+      </div>
+      <nav class="menu-items">
+        <a href="{% url 'dashboard' %}" class="menu-item"><img src="{% static 'images/dashboard2.png' %}" class="icon" /><span>Dashboard</span></a>
+        <a href="{% url 'admin_courses' %}" class="menu-item"><img src="{% static 'images/courses.svg' %}" class="icon" /><span>Courses</span></a>
+        <a href="{% url 'admin_students' %}" class="menu-item"><img src="{% static 'images/students.svg' %}" class="icon" /><span>Students</span></a>
+        <a href="{% url 'settings' %}" class="menu-item"><img src="{% static 'images/setting.png' %}" class="icon" /><span>Settings</span></a>
+      </nav>
+      <div class="menu-footer">
+        <a href="{% url 'logout' %}" class="menu-item logout"><img src="{% static 'images/Logout.png' %}" class="icon" /><span>Logout</span></a>
+      </div>
+    </article>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+      <header class="header">
+        <h1>{{ course.name }}</h1>
+        <p>{{ course.code }} | {{ course.students.count }} students</p>
+      </header>
+      
+      <!-- Action buttons -->
+      <div class="action-buttons">
+        <a href="{% url 'add_assignment' course.id %}" class="action-button">Add Assignment</a>
+        <a href="{% url 'record_attendance' course.id %}" class="action-button secondary">Record Attendance</a>
+        <form method="post" action="{% url 'run_predictions' %}" style="display: inline;">
+          {% csrf_token %}
+          <input type="hidden" name="course_id" value="{{ course.id }}">
+          <button type="submit" class="action-button">Update Predictions</button>
+        </form>
+      </div>
+      
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" data-tab="students">Students</button>
+        <button class="tab" data-tab="assignments">Assignments</button>
+        <button class="tab" data-tab="grades">Grades</button>
+        <button class="tab" data-tab="predictions">Predictions</button>
+      </div>
+      
+      <!-- Tab content -->
+      <div id="students" class="tab-content active">
+        <h2>Course Students</h2>
+        <div class="grid">
+          {% for student in students %}
+          <div class="card">
+            <h3>{{ student.get_full_name }}</h3>
+            <p>{{ student.email }}</p>
+            <p>ID: {{ student.student_number }}</p>
+            <p>
+              <a href="{% url 'student_details' student.id %}" class="grade-button">Details</a>
+            </p>
+          </div>
+          {% empty %}
+          <p>No students enrolled in this course.</p>
+          {% endfor %}
+        </div>
+      </div>
+      
+      <div id="assignments" class="tab-content">
+        <h2>Course Assignments</h2>
+        <div class="grid">
+          {% for assignment in assignments %}
+          <div class="card">
+            <h3>{{ assignment.title }}</h3>
+            <p>Due date: {{ assignment.due_date|date:"d.m.Y H:i" }}</p>
+            <p>Maximum points: {{ assignment.max_points }}</p>
+            <p>
+              {% now "U" as current_timestamp %}
+              {% with assignment_timestamp=assignment.due_date|date:"U" %}
+              {% with week_later=assignment_timestamp|add:"604800" %}
+              
+              {% if assignment_timestamp > current_timestamp %}
+              <span class="status upcoming">Upcoming</span>
+              {% elif assignment_timestamp <= current_timestamp and week_later >= current_timestamp %}
+              <span class="status active">Active</span>
+              {% else %}
+              <span class="status completed">Completed</span>
+              {% endif %}
+              
+              {% endwith %}
+              {% endwith %}
+            </p>
+          </div>
+          {% empty %}
+          <p>No assignments for this course.</p>
+          {% endfor %}
+        </div>
+      </div>
+      
+      <div id="grades" class="tab-content">
+        <h2>Student Grades</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              {% for assignment in assignments %}
+              <th>{{ assignment.title }}</th>
+              {% endfor %}
+              <th>Average</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for student in students %}
+            <tr>
+              <td>{{ student.get_full_name }}</td>
+              {% for assignment in assignments %}
+              <td class="grade-cell">
+                {% with grade=student.grades.all|filter_by_assignment:assignment %}
+                <div class="grade">
+                  <span>{% if grade %}{{ grade.score }}{% else %}-{% endif %}</span>
+                  <div class="grade-actions">
+                    <a href="{% url 'add_grade' assignment.id student.id %}" class="grade-button">
+                      {% if grade %}Edit{% else %}Add{% endif %}
+                    </a>
+                  </div>
+                </div>
+                {% endwith %}
+              </td>
+              {% endfor %}
+              <td>
+                {% with avg=student.grades.all|filter_by_course:course|avg_grade %}
+                {{ avg|floatformat:1 }}
+                {% endwith %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="{{ assignments|length|add:2 }}">No student data.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      
+      <div id="predictions" class="tab-content">
+        <h2>Performance Predictions</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Predicted Grade</th>
+              <th>Confidence</th>
+              <th>Prediction Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for student in students %}
+            <tr>
+              <td>{{ student.get_full_name }}</td>
+              {% with prediction=student.predictions.all|filter_by_course:course|first %}
+              {% if prediction %}
+              <td>{{ prediction.predicted_score|floatformat:1 }}</td>
+              <td>{{ prediction.confidence|floatformat:2 }}</td>
+              <td>{{ prediction.created_at|date:"d.m.Y" }}</td>
+              {% else %}
+              <td colspan="3">No data</td>
+              {% endif %}
+              {% endwith %}
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4">No student data.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Tab functionality
+      const tabs = document.querySelectorAll('.tab');
+      const tabContents = document.querySelectorAll('.tab-content');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          const tabId = this.getAttribute('data-tab');
+          
+          // Remove active class from all tabs and content
+          tabs.forEach(t => t.classList.remove('active'));
+          tabContents.forEach(c => c.classList.remove('active'));
+          
+          // Add active class to selected tab and content
+          this.classList.add('active');
+          document.getElementById(tabId).classList.add('active');
+        });
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add Grade | {{ assignment.title }}</title>
+  <link rel="stylesheet" href="{% static 'css/admin_courses.css' %}" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    .form-container {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      max-width: 700px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    .button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    
+    .primary-button {
+      background: #605BFF;
+      color: white;
+    }
+    
+    .secondary-button {
+      background: #e0e0e0;
+      color: #333;
+      text-decoration: none;
+    }
+    
+    .info-card {
+      background: #f5f5f5;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .info-card p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+    
+    .info-card strong {
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- LEFT SIDEBAR -->
+    <article class="menu-container">
+      <div class="menu-header">
+        <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo" />
+        <span class="app-name">Base</span>
+      </div>
+      <nav class="menu-items">
+        <a href="{% url 'dashboard' %}" class="menu-item"><img src="{% static 'images/dashboard2.png' %}" class="icon" /><span>Dashboard</span></a>
+        <a href="{% url 'admin_courses' %}" class="menu-item"><img src="{% static 'images/courses.svg' %}" class="icon" /><span>Courses</span></a>
+        <a href="{% url 'admin_students' %}" class="menu-item"><img src="{% static 'images/students.svg' %}" class="icon" /><span>Students</span></a>
+        <a href="{% url 'settings' %}" class="menu-item"><img src="{% static 'images/setting.png' %}" class="icon" /><span>Settings</span></a>
+      </nav>
+      <div class="menu-footer">
+        <a href="{% url 'logout' %}" class="menu-item logout"><img src="{% static 'images/Logout.png' %}" class="icon" /><span>Logout</span></a>
+      </div>
+    </article>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+      <header class="header">
+        <h1>Add Grade</h1>
+        <p>Student: {{ student.get_full_name }} | Assignment: {{ assignment.title }}</p>
+      </header>
+      
+      <div class="form-container">
+        <div class="info-card">
+          <p><strong>Course:</strong> {{ assignment.course.name }}</p>
+          <p><strong>Assignment:</strong> {{ assignment.title }}</p>
+          <p><strong>Due date:</strong> {{ assignment.due_date|date:"d.m.Y H:i" }}</p>
+          <p><strong>Maximum points:</strong> {{ assignment.max_points }}</p>
+          <p><strong>Student:</strong> {{ student.get_full_name }} ({{ student.student_number }})</p>
+        </div>
+        
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="score">Grade (0-{{ assignment.max_points }})</label>
+            <input type="number" id="score" name="score" min="0" max="{{ assignment.max_points }}" step="0.1" value="{{ form.score.value|default:0 }}" required>
+          </div>
+          
+          <div class="button-group">
+            <button type="submit" class="button primary-button">Save</button>
+            <a href="{% url 'course_details' assignment.course.id %}" class="button secondary-button">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

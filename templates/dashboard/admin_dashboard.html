@@ -1,0 +1,161 @@
+{% load static dashboard_extras %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard | Academic Performance Prediction System</title>
+  <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <!-- LEFT SIDEBAR -->
+    <article class="menu-container">
+        <div class="menu-header">
+            <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo" />
+            <span class="app-name">Base</span>
+          </div>
+          <nav class="menu-items">
+            <a href="{% url 'dashboard' %}" class="menu-item"><img src="{% static 'images/dashboard3.png' %}" class="icon" /><span>Dashboard</span></a>
+            <a href="{% url 'admin_courses' %}" class="menu-item"><img src="{% static 'images/courses.svg' %}" class="icon" /><span>Courses</span></a>
+            <a href="{% url 'admin_students' %}" class="menu-item"><img src="{% static 'images/students.svg' %}" class="icon" /><span>Students</span></a>
+            <a href="{% url 'settings' %}" class="menu-item"><img src="{% static 'images/setting.png' %}" class="icon" /><span>Settings</span></a>
+          </nav>
+          <div class="menu-footer">
+            <a href="{% url 'logout' %}" class="menu-item logout"><img src="{% static 'images/Logout.png' %}" class="icon" /><span>Logout</span></a>
+          </div>
+        </article>
+    
+        <!-- MAIN CONTENT -->
+        <main class="main">
+          <header class="header">
+            <h1>Admin Dashboard</h1>
+            <p>Academic Performance Prediction System Overview</p>
+          </header>
+    
+          <div class="stats">
+            <div class="stat-box">
+              <p>Total Students</p>
+              <h2>{{ total_students }}</h2>
+            </div>
+            <div class="stat-box">
+              <p>Total Courses</p>
+              <h2>{{ total_courses }}</h2>
+            </div>
+          </div>
+    
+          <div class="row">
+            <div class="prediction-overview">
+              <h3>Prediction Overview</h3>
+              <div class="chart-wrapper">
+                <canvas id="predictionChart"></canvas>
+              </div>
+            </div>
+    
+            <div class="recent-activity">
+              <h3>Recent Predictions</h3>
+              <ul class="activity-list">
+                {% for prediction in recent_predictions %}
+                <li>
+                  <div class="activity-info">
+                    <h4>{{ prediction.student.get_full_name }}</h4>
+                    <p>{{ prediction.course.name }}</p>
+                  </div>
+                  <div class="activity-score">
+                    <span class="score">{{ prediction.predicted_score|floatformat:1 }}</span>
+                    <span class="confidence">{{ prediction.confidence|floatformat:2 }}</span>
+                  </div>
+                </li>
+                {% empty %}
+                <li>No recent predictions</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+    
+          <div class="action-box">
+            <h3>Quick Actions</h3>
+            <div class="action-buttons">
+              <a href="{% url 'admin_courses' %}" class="action-button">Manage Courses</a>
+              <a href="{% url 'admin_students' %}" class="action-button">Manage Students</a>
+              <form method="post" action="{% url 'run_predictions' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="action-button primary">Run Prediction</button>
+              </form>
+            </div>
+          </div>
+        </main>
+      </div>
+    
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const ctx = document.getElementById('predictionChart').getContext('2d');
+          
+          // Use real prediction data from context
+          {% if prediction_stats %}
+          const predictionData = {
+            '90-100': {{ prediction_stats|get_item:'90-100'|default:0 }},
+            '80-89': {{ prediction_stats|get_item:'80-89'|default:0 }},
+            '70-79': {{ prediction_stats|get_item:'70-79'|default:0 }},
+            '60-69': {{ prediction_stats|get_item:'60-69'|default:0 }},
+            '<60': {{ prediction_stats|get_item:'<60'|default:0 }}
+          };
+          {% else %}
+          const predictionData = {
+            '90-100': 0,
+            '80-89': 0,
+            '70-79': 0,
+            '60-69': 0,
+            '<60': 0
+          };
+          {% endif %}
+          
+          const predictionChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: ['90-100', '80-89', '70-79', '60-69', '<60'],
+              datasets: [{
+                label: 'Prediction Distribution',
+                data: [
+                  predictionData['90-100'],
+                  predictionData['80-89'],
+                  predictionData['70-79'],
+                  predictionData['60-69'],
+                  predictionData['<60']
+                ],
+                backgroundColor: [
+                  'rgba(75, 192, 192, 0.8)',
+                  'rgba(54, 162, 235, 0.8)',
+                  'rgba(255, 206, 86, 0.8)',
+                  'rgba(255, 159, 64, 0.8)',
+                  'rgba(255, 99, 132, 0.8)'
+                ],
+                borderColor: [
+                  'rgba(75, 192, 192, 1)',
+                  'rgba(54, 162, 235, 1)',
+                  'rgba(255, 206, 86, 1)',
+                  'rgba(255, 159, 64, 1)',
+                  'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    stepSize: 1,
+                    precision: 0
+                  }
+                }
+              }
+            }
+          });
+        });
+      </script>
+    </body>
+    </html>

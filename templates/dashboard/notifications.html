@@ -1,0 +1,124 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notifications | Academic Performance Prediction System</title>
+  <link rel="stylesheet" href="{% static 'css/notification.css' %}" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+ </head>
+<body>
+  <div class="container">
+    <!-- LEFT MENU -->
+    <article class="menu-container">
+      <div class="menu-header">
+        <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo" />
+        <span class="app-name">Base</span>
+      </div>
+      <nav class="menu-items">
+        <a href="{% url 'dashboard' %}" class="menu-item"><img src="{% static 'images/dashboard2.png' %}" class="icon" /><span>Dashboard</span></a>
+        <a href="{% url 'notifications' %}" class="menu-item"><img src="{% static 'images/notification.png' %}" class="icon" /><span>Notifications</span></a>
+        <a href="{% url 'support' %}" class="menu-item"><img src="{% static 'images/support.png' %}" class="icon" /><span>Support</span></a>
+        <a href="{% url 'settings' %}" class="menu-item"><img src="{% static 'images/setting.png' %}" class="icon" /><span>Settings</span></a>
+      </nav>
+      <div class="menu-footer">
+        <a href="{% url 'logout' %}" class="menu-item logout"><img src="{% static 'images/Logout.png' %}" class="icon" /><span>Logout</span></a>
+      </div>
+    </article>
+
+    <!-- MIDDLE NOTIFICATION AREA -->
+    <main class="notification-side">
+      <h2 class="notification-title">Notifications</h2>
+      
+      <div class="message-box">
+        <!-- New assignments -->
+        {% for assignment in new_assignments %}
+        <div class="message">
+          <img src="{% static 'images/notification2.png' %}" class="icon" alt="Notification Icon">
+          <div class="message-text">
+            <h3>New Assignment</h3>
+            <p>A new assignment has been added for "{{ assignment.course.name }}" course. Due date: {{ assignment.due_date|date:"d.m.Y" }}.</p>
+          </div>
+        </div>
+        {% endfor %}
+        
+        <!-- New grades -->
+        {% for grade in recent_grades %}
+        <div class="message">
+          <img src="{% static 'images/grade_icon.svg' %}" class="icon" alt="Grade Icon">
+          <div class="message-text">
+            <h3>New Grade</h3>
+            <p>You received a grade of {{ grade.score|floatformat:1 }} for "{{ grade.assignment.title }}" in "{{ grade.assignment.course.name }}" course.</p>
+          </div>
+        </div>
+        {% endfor %}
+        
+        <!-- Recent predictions -->
+        {% for prediction in recent_predictions %}
+        <div class="message">
+          <img src="{% static 'images/prediction_icon.svg' %}" class="icon" alt="Prediction Icon">
+          <div class="message-text">
+            <h3>Prediction Update</h3>
+            <p>Your predicted final grade for "{{ prediction.course.name }}" is {{ prediction.predicted_score|floatformat:1 }} (confidence: {{ prediction.confidence|floatformat:2 }}).</p>
+          </div>
+        </div>
+        {% endfor %}
+        
+        <!-- Attendance warnings -->
+        {% for course in courses_with_low_attendance %}
+        <div class="message">
+          <img src="{% static 'images/warning_icon.png' %}" class="icon" alt="Warning Icon">
+          <div class="message-text">
+            <h3>Attendance Warning</h3>
+            <p>Your attendance for "{{ course.name }}" is below 75%. This may negatively impact your final grade.</p>
+          </div>
+        </div>
+        {% endfor %}
+        
+        {% if not new_assignments and not recent_grades and not recent_predictions and not courses_with_low_attendance %}
+        <div class="message">
+          <img src="{% static 'images/notification2.png' %}" class="icon" alt="Notification Icon">
+          <div class="message-text">
+            <h3>No New Notifications</h3>
+            <p>You have no new notifications at this time.</p>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </main>
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="profile">
+      <div class="avatar">
+        <!-- Can be replaced with actual user image in the future -->
+      </div>
+      <div class="info">
+        <h3>{{ request.user.first_name }} {{ request.user.last_name }}</h3>
+        <p>{{ request.user.email }}</p>
+        <p>ID: {{ request.user.student_number }}</p>
+      </div>
+      <div class="courses">
+        <h3>My Courses</h3>
+        {% for course in courses %}
+        <button {% if forloop.first %}class="active"{% endif %}>{{ course.name }}</button>
+        {% empty %}
+        <p>No course enrollment</p>
+        {% endfor %}
+      </div>
+    </aside>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const courseButtons = document.querySelectorAll('.courses button');
+      courseButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          courseButtons.forEach(btn => btn.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
+    });
+  </script>
+</body>
+</html>

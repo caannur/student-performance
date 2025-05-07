@@ -1,0 +1,181 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Participation Tracking | {{ course.name }}</title>
+  <link rel="stylesheet" href="{% static 'css/admin_courses.css' %}" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    .form-container {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    
+    .form-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .date-picker {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .date-picker label {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .date-picker input {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    
+    th {
+      font-weight: 600;
+      color: #555;
+      background: #f8f8f8;
+    }
+    
+    .participation-select {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      width: 100%;
+    }
+    
+    .notes-input {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      width: 100%;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      justify-content: flex-end;
+    }
+    
+    .button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    
+    .primary-button {
+      background: #605BFF;
+      color: white;
+    }
+    
+    .secondary-button {
+      background: #e0e0e0;
+      color: #333;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- LEFT SIDEBAR -->
+    <article class="menu-container">
+      <div class="menu-header">
+        <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo" />
+        <span class="app-name">Base</span>
+      </div>
+      <nav class="menu-items">
+        <a href="{% url 'dashboard' %}" class="menu-item"><img src="{% static 'images/dashboard2.png' %}" class="icon" /><span>Dashboard</span></a>
+        <a href="{% url 'admin_courses' %}" class="menu-item"><img src="{% static 'images/courses.svg' %}" class="icon" /><span>Courses</span></a>
+        <a href="{% url 'admin_students' %}" class="menu-item"><img src="{% static 'images/students.svg' %}" class="icon" /><span>Students</span></a>
+        <a href="{% url 'settings' %}" class="menu-item"><img src="{% static 'images/setting.png' %}" class="icon" /><span>Settings</span></a>
+      </nav>
+      <div class="menu-footer">
+        <a href="{% url 'logout' %}" class="menu-item logout"><img src="{% static 'images/Logout.png' %}" class="icon" /><span>Logout</span></a>
+      </div>
+    </article>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+      <header class="header">
+        <h1>Student Participation Tracking</h1>
+        <p>Course: {{ course.name }}</p>
+      </header>
+      
+      <div class="form-container">
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-header">
+            <div class="date-picker">
+              <label for="date">Date:</label>
+              <input type="date" id="date" name="date" value="{{ today|date:'Y-m-d' }}" required>
+            </div>
+          </div>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Student</th>
+                <th>Participation Level</th>
+                <th>Comments</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for student in students %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ student.get_full_name }}</td>
+                <td>
+                  <select name="level_{{ student.id }}" class="participation-select">
+                    {% for value, label in participation_levels %}
+                    <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                  </select>
+                </td>
+                <td>
+                  <input type="text" name="notes_{{ student.id }}" class="notes-input" placeholder="Comment...">
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4">No students enrolled in this course.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          
+          <div class="button-group">
+            <a href="{% url 'course_details' course.id %}" class="button secondary-button">Cancel</a>
+            <button type="submit" class="button primary-button">Save</button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Course Management | Academic Performance Prediction System</title>
+  <link rel="stylesheet" href="{% static 'css/admin_courses.css' %}" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <!-- LEFT SIDEBAR -->
+    <article class="menu-container">
+      <div class="menu-header">
+        <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo" />
+        <span class="app-name">Base</span>
+      </div>
+      <nav class="menu-items">
+        <a href="{% url 'dashboard' %}" class="menu-item"><img src="{% static 'images/dashboard2.png' %}" class="icon" /><span>Dashboard</span></a>
+        <a href="{% url 'admin_courses' %}" class="menu-item"><img src="{% static 'images/courses.svg' %}" class="icon" /><span>Courses</span></a>
+        <a href="{% url 'admin_students' %}" class="menu-item"><img src="{% static 'images/students.svg' %}" class="icon" /><span>Students</span></a>
+        <a href="{% url 'settings' %}" class="menu-item"><img src="{% static 'images/setting.png' %}" class="icon" /><span>Settings</span></a>
+      </nav>
+      <div class="menu-footer">
+        <a href="{% url 'logout' %}" class="menu-item logout"><img src="{% static 'images/Logout.png' %}" class="icon" /><span>Logout</span></a>
+      </div>
+    </article>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+      <header class="header">
+        <h1>Course Management</h1>
+        <p>Add, edit, and manage courses</p>
+      </header>
+
+      <div class="action-bar">
+        <button id="addCourseBtn" class="add-button">Add New Course</button>
+      </div>
+
+      <div class="content-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Students</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for course in courses %}
+            <tr>
+              <td>{{ course.code }}</td>
+              <td>{{ course.name }}</td>
+              <td>{{ course.description|truncatechars:40 }}</td>
+              <td>{{ course.student_count }}</td>
+              <td class="actions">
+                <a href="{% url 'course_details' course.id %}" class="edit-btn">Manage</a>
+                <button class="delete-btn" data-id="{{ course.id }}">Delete</button>
+                <form method="post" action="{% url 'run_predictions' %}" style="display: inline;">
+                  {% csrf_token %}
+                  <input type="hidden" name="course_id" value="{{ course.id }}">
+                  <button type="submit" class="predict-btn">Predict</button>
+                </form>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="no-results">No courses</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Course Modal -->
+  <div id="addCourseModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Add New Course</h2>
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="code">Course Code</label>
+          <input type="text" id="code" name="code" required>
+        </div>
+        <div class="form-group">
+          <label for="name">Course Name</label>
+          <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" name="description" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="students">Students</label>
+          <select id="students" name="students" multiple>
+            {% for student in students %}
+            <option value="{{ student.id }}">{{ student.get_full_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="submit-btn">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Course Confirmation Modal -->
+<div id="deleteCourseModal" class="modal">
+  <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Delete Confirmation</h2>
+      <p>Are you sure you want to delete this course? This action cannot be undone.</p>
+      <form method="post" id="deleteCourseForm" action="">
+          {% csrf_token %}
+          <div class="button-group">
+              <button type="button" class="cancel-btn">Cancel</button>
+              <button type="submit" class="submit-btn">Delete</button>
+          </div>
+      </form>
+  </div>
+</div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Course addition modal
+      const addModal = document.getElementById('addCourseModal');
+      const addBtn = document.getElementById('addCourseBtn');
+      const addModalClose = addModal.querySelector('.close');
+      
+      addBtn.onclick = function() {
+        addModal.style.display = 'block';
+      }
+      
+      addModalClose.onclick = function() {
+        addModal.style.display = 'none';
+      }
+      
+      // Course deletion modal
+      const deleteModal = document.getElementById('deleteCourseModal');
+      const deleteModalClose = deleteModal.querySelector('.close');
+      const cancelBtn = deleteModal.querySelector('.cancel-btn');
+      const deleteButtons = document.querySelectorAll('.delete-btn');
+      const deleteForm = document.getElementById('deleteCourseForm');
+        
+        deleteButtons.forEach(button => {
+            button.onclick = function() {
+                const courseId = this.getAttribute('data-id');
+                deleteForm.action = `/dashboard/admin/courses/${courseId}/delete/`;
+                deleteModal.style.display = 'block';
+            }
+        });
+      deleteModalClose.onclick = function() {
+        deleteModal.style.display = 'none';
+      }
+      
+      cancelBtn.onclick = function() {
+        deleteModal.style.display = 'none';
+      }
+      
+      // Close modals when clicking outside their content
+      window.onclick = function(event) {
+        if (event.target == addModal) {
+          addModal.style.display = 'none';
+        }
+        if (event.target == deleteModal) {
+          deleteModal.style.display = 'none';
+        }
+      }
+    });
+  </script>
+</body>
+</html>

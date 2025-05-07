@@ -1,0 +1,127 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Management | Academic Performance Prediction System</title>
+  <link rel="stylesheet" href="{% static 'css/admin_students.css' %}" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <!-- LEFT SIDEBAR -->
+    <article class="menu-container">
+      <div class="menu-header">
+        <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo" />
+        <span class="app-name">Base</span>
+      </div>
+      <nav class="menu-items">
+        <a href="{% url 'dashboard' %}" class="menu-item"><img src="{% static 'images/dashboard2.png' %}" class="icon" /><span>Dashboard</span></a>
+        <a href="{% url 'admin_courses' %}" class="menu-item"><img src="{% static 'images/courses.svg' %}" class="icon" /><span>Courses</span></a>
+        <a href="{% url 'admin_students' %}" class="menu-item"><img src="{% static 'images/students.svg' %}" class="icon" /><span>Students</span></a>
+        <a href="{% url 'settings' %}" class="menu-item"><img src="{% static 'images/setting.png' %}" class="icon" /><span>Settings</span></a>
+      </nav>
+      <div class="menu-footer">
+        <a href="{% url 'logout' %}" class="menu-item logout"><img src="{% static 'images/Logout.png' %}" class="icon" /><span>Logout</span></a>
+      </div>
+    </article>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+      <header class="header">
+        <h1>Student Management</h1>
+        <p>View and analyze student data</p>
+      </header>
+
+      <div class="search-bar">
+        <input type="text" id="studentSearch" placeholder="Search students...">
+        <select id="courseFilter">
+          <option value="">All courses</option>
+          {% for course in courses %}
+          <option value="{{ course.id }}">{{ course.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="content-table">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Student ID</th>
+              <th>Courses</th>
+              <th>Average Grade</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for student in students %}
+            <tr data-courses="{{ student.enrolled_courses.all|join:',' }}" data-course-ids="{% for course in student.enrolled_courses.all %}{{ course.id }}{% if not forloop.last %},{% endif %}{% endfor %}">
+              <td>{{ student.id }}</td>
+              <td>{{ student.get_full_name }}</td>
+              <td>{{ student.email }}</td>
+              <td>{{ student.student_number }}</td>
+              <td>{{ student.course_count }}</td>
+              <td>{{ student.avg_score|default:'N/A'|floatformat:1 }}</td>
+              <td class="actions">
+                <a href="{% url 'student_details' student.id %}" class="view-btn">View</a>
+                <!-- Edit button removed -->
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="no-results">No students</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- Edit modal removed as edit button was removed -->
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Search and filter functionality
+      const searchInput = document.getElementById('studentSearch');
+      const courseFilter = document.getElementById('courseFilter');
+      const tableRows = document.querySelectorAll('tbody tr');
+      
+      function filterStudents() {
+        const searchValue = searchInput.value.toLowerCase();
+        const courseValue = courseFilter.value;
+        
+        tableRows.forEach(row => {
+          if (!row.classList.contains('no-results')) {
+            const name = row.cells[1].textContent.toLowerCase();
+            const email = row.cells[2].textContent.toLowerCase();
+            const studentNumber = row.cells[3].textContent.toLowerCase();
+            const courseIds = row.getAttribute('data-course-ids') || '';
+            
+            const matchesSearch = name.includes(searchValue) || 
+                                email.includes(searchValue) || 
+                                studentNumber.includes(searchValue);
+            
+            // Improved course checking logic using course IDs
+            const matchesCourse = !courseValue || 
+                                courseIds.split(',').includes(courseValue);
+            
+            if (matchesSearch && matchesCourse) {
+              row.style.display = '';
+            } else {
+              row.style.display = 'none';
+            }
+          }
+        });
+      }
+      
+      searchInput.addEventListener('input', filterStudents);
+      courseFilter.addEventListener('change', filterStudents);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Nunito', sans-serif;
+  }
+  
+  body {
+    background-color: #f4f6f8;
+    color: #333;
+  }
+  
+  .container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+  }
+  
+  /* Left Sidebar (Menu) */
+  .menu-container {
+    width: 220px;
+    background-color: white;
+    padding: 20px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 12px;
+    margin: 10px;
+  }
+  
+  .menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-top: 24px;
+    margin-bottom: 30px;
+    padding-left: 12px;
+  }
+  
+  .logo {
+    width: 42px;
+    height: 42px;
+  }
+  
+  .app-name {
+    font-size: 28px;
+    font-weight: bold;
+    font-family: 'Nunito', sans-serif;
+  }
+  
+  .menu-items {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 120px;
+  }
+  
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: #333;
+    border-radius: 10px;
+    transition: background-color 0.3s, transform 0.2s;
+  }
+  
+  .menu-item:hover {
+    background-color: #f0f0f0;
+    transform: translateX(4px);
+  }
+  
+  .icon {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .menu-footer {
+    margin-top: auto;
+  }
+  
+  .logout {
+    color: #030229;
+  }
+  
+  /* MAIN CONTENT AREA */
+  .content-area {
+    flex: 1;
+    padding: 40px;
+    background-color: #FAFAFB;
+    overflow-y: auto;
+  }
+  
+  .page-header h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    font-family: 'Nunito', sans-serif;
+  }
+  
+  .form-section {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 700px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .form-section h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    font-family: 'Nunito', sans-serif;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-row {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .form-group.half {
+    flex: 1;
+  }
+  
+  label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: #333;
+    text-transform: uppercase;
+    font-family: 'Nunito', sans-serif;
+  }
+  
+  input[type="password"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #00ABC2;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    font-family: 'Nunito', sans-serif;
+  }
+  
+  input[type="password"]:focus {
+    border-color: #00ABC2;
+    box-shadow: 0 0 0 2px rgba(96, 91, 255, 0.2);
+  }
+  
+  button {
+    background-color: #00ABC2;
+    color: white;
+    padding: 12px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-family: 'Nunito', sans-serif;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: background-color 0.3s;
+  }
+  
+  button:hover {
+    background-color: #008fa3;
+  }
+  
+  .note {
+    font-size: 16px;
+    color: #666;
+    margin-top: 15px;
+    font-family: 'Nunito', sans-serif;
+  }
+  
+  /* Адаптивный дизайн */
+  @media (max-width: 992px) {
+    .container {
+      flex-direction: column;
+      height: auto;
+    }
+    
+    .menu-container {
+      width: auto;
+      margin: 10px;
+      flex-direction: row;
+      align-items: center;
+      padding: 10px;
+    }
+    
+    .menu-header {
+      margin: 0;
+    }
+    
+    .menu-items {
+      display: flex;
+      flex-direction: row;
+      margin: 0;
+      overflow-x: auto;
+      padding: 0 20px;
+    }
+    
+    .menu-footer {
+      margin: 0;
+    }
+    
+    .content-area {
+      padding: 20px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .form-row {
+      flex-direction: column;
+      gap: 0;
+    }
+    
+    .form-section {
+      padding: 20px;
+    }
+    
+    .page-header h1 {
+      font-size: 24px;
+    }
+  }

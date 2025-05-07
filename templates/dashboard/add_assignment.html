@@ -1,0 +1,195 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add Assignment | {{ course.name }}</title>
+  <link rel="stylesheet" href="{% static 'css/admin_courses.css' %}" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    .form-container {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      max-width: 700px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .form-group input[type="datetime-local"] {
+      padding: 8px;
+    }
+    
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    .button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    
+    .primary-button {
+      background: #605BFF;
+      color: white;
+    }
+    
+    .secondary-button {
+      background: #e0e0e0;
+      color: #333;
+      text-decoration: none;
+    }
+    
+    .errorlist {
+      color: #e53935;
+      font-size: 14px;
+      margin-top: 5px;
+      padding-left: 0;
+      list-style-type: none;
+    }
+    
+    .error-message {
+      background-color: #ffebee;
+      border: 1px solid #ffcdd2;
+      color: #b71c1c;
+      padding: 10px 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- LEFT SIDEBAR -->
+    <article class="menu-container">
+      <div class="menu-header">
+        <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo" />
+        <span class="app-name">Base</span>
+      </div>
+      <nav class="menu-items">
+        <a href="{% url 'dashboard' %}" class="menu-item"><img src="{% static 'images/dashboard2.png' %}" class="icon" /><span>Dashboard</span></a>
+        <a href="{% url 'admin_courses' %}" class="menu-item"><img src="{% static 'images/courses.svg' %}" class="icon" /><span>Courses</span></a>
+        <a href="{% url 'admin_students' %}" class="menu-item"><img src="{% static 'images/students.svg' %}" class="icon" /><span>Students</span></a>
+        <a href="{% url 'settings' %}" class="menu-item"><img src="{% static 'images/setting.png' %}" class="icon" /><span>Settings</span></a>
+      </nav>
+      <div class="menu-footer">
+        <a href="{% url 'logout' %}" class="menu-item logout"><img src="{% static 'images/Logout.png' %}" class="icon" /><span>Logout</span></a>
+      </div>
+    </article>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+      <header class="header">
+        <h1>Add Assignment</h1>
+        <p>Course: {{ course.name }}</p>
+      </header>
+      
+      <div class="form-container">
+        {% if form.errors %}
+        <div class="error-message">
+          <p><strong>Please correct the following errors:</strong></p>
+          <ul>
+            {% for field in form %}
+              {% for error in field.errors %}
+                <li>{{ field.label }}: {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+        
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="form-group">
+            <label for="{{ form.title.id_for_label }}">Assignment Title</label>
+            {{ form.title }}
+            {% if form.title.errors %}
+              <ul class="errorlist">
+              {% for error in form.title.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+          
+          <div class="form-group">
+            <label for="{{ form.description.id_for_label }}">Description</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+              <ul class="errorlist">
+              {% for error in form.description.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+          
+          <div class="form-group">
+            <label for="{{ form.due_date.id_for_label }}">Due Date</label>
+            {{ form.due_date }}
+            {% if form.due_date.errors %}
+              <ul class="errorlist">
+              {% for error in form.due_date.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+          
+          <div class="form-group">
+            <label for="{{ form.max_points.id_for_label }}">Maximum Points</label>
+            {{ form.max_points }}
+            {% if form.max_points.errors %}
+              <ul class="errorlist">
+              {% for error in form.max_points.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+          
+          <div class="button-group">
+            <button type="submit" class="button primary-button">Save</button>
+            <a href="{% url 'course_details' course.id %}" class="button secondary-button">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=prediction_db
+      - POSTGRES_USER=prediction_user
+      - POSTGRES_PASSWORD=prediction_password
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    command: gunicorn prediction_system.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - .:/app
+      - static_volume:/app/static
+      - media_volume:/app/media
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DEBUG=1  # Для отладки
+      - DATABASE=postgres
+      - SQL_ENGINE=django.db.backends.postgresql
+      - SQL_DATABASE=prediction_db
+      - SQL_USER=prediction_user
+      - SQL_PASSWORD=prediction_password
+      - SQL_HOST=db
+      - SQL_PORT=5432
+
+  nginx:
+    image: nginx:1.21
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - static_volume:/home/app/web/static
+      - media_volume:/home/app/web/media
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:

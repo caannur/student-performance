@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Support | Academic Performance Prediction System</title>
+  <link rel="stylesheet" href="/static/css/support.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <!-- LEFT SIDEBAR -->
+    <article class="menu-box">
+      <div class="menu-header">
+        <img src="/static/images/logo.png" alt="Logo" class="logo" />
+        <span class="app-name">Base</span>
+      </div>
+      <nav class="menu-items">
+        <a href="{% url 'dashboard' %}" class="menu-item"><img src="/static/images/dashboard2.png" class="icon" /><span>Dashboard</span></a>
+        <a href="{% url 'notifications' %}" class="menu-item"><img src="/static/images/notification.png" class="icon" /><span>Notifications</span></a>
+        <a href="{% url 'support' %}" class="menu-item"><img src="/static/images/support.png" class="icon" /><span>Support</span></a>
+        <a href="{% url 'settings' %}" class="menu-item"><img src="/static/images/setting.png" class="icon" /><span>Settings</span></a>
+      </nav>
+      <div class="menu-footer">
+        <a href="{% url 'logout' %}" class="menu-item logout"><img src="/static/images/Logout.png" class="icon" /><span>Logout</span></a>
+      </div>
+    </article>
+
+    <!-- MAIN CONTENT AND PROFILE -->
+    <div class="main">
+      <div class="support-box">
+        <h2>Support</h2>
+
+        <div class="support-section">
+          <h3>Need Help?</h3>
+          <p>If you have questions, issues, or need assistance, we're here for you!</p>
+        </div>
+
+        <div class="support-section">
+          <h3>Technical Support:</h3>
+          <p>Having problems accessing the dashboard, courses, or notifications? Contact our IT support team for quick assistance.</p>
+        </div>
+
+        <div class="support-section">
+          <h3>Academic Support:</h3>
+          <p>Need academic help or assistance with courses? Our academic advisors are here to help you.</p>
+        </div>
+
+        <div class="support-section">
+          <h3>General Questions:</h3>
+          <p>For any general questions about the system or your profile, feel free to reach out!</p>
+        </div>
+
+        <div class="support-section">
+          <h3>Contact Us:</h3>
+          <p>📧 support@baseuniversity.edu<br>📞 +123 456 7890</p>
+        </div>
+
+        <div class="support-hours">
+          Our support service is available Monday through Friday, 9:00 AM to 5:00 PM.
+        </div>
+      </div>
+
+      <!-- RIGHT SIDEBAR -->
+      <aside class="profile">
+        <div class="avatar">
+          <!-- Can be replaced with actual user image in the future -->
+        </div>
+        <div class="info">
+          <h3>{{ request.user.first_name }} {{ request.user.last_name }}</h3>
+          <p>{{ request.user.email }}</p>
+          <p>ID: {{ request.user.student_number }}</p>
+        </div>
+        <div class="courses">
+          <h3>My Courses</h3>
+          {% for course in courses %}
+          <button {% if forloop.first %}class="active"{% endif %}>{{ course.name }}</button>
+          {% empty %}
+          <p>No course enrollment</p>
+          {% endfor %}
+        </div>
+      </aside>
+    </div>
+  </div>
+</body>
+</html>

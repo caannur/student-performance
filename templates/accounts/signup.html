@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registration | Academic Performance Prediction System</title>
+  <link rel="stylesheet" href="/static/css/sign_up.css">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="wrapper">
+    <div class="form-section">
+      <!-- Logo -->
+      <div class="logo">
+        <img src="/static/images/Logo.png" alt="Logo">
+      </div>
+
+      <h2>Registration</h2>
+
+      <!-- Separator -->
+      <div class="separator">
+        <span>or</span>
+      </div>
+
+      <!-- Form -->
+      <form method="post">
+        {% csrf_token %}
+        <input type="text" name="full_name" placeholder="Full Name" required>
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="text" name="student_number" placeholder="Student ID" required>
+        <input type="password" name="password1" placeholder="Password" required>
+        <input type="password" name="password2" placeholder="Confirm Password" required>
+
+        <div class="checkbox-text">
+          <label>
+            <input type="checkbox" required>
+            By creating an account, you agree to our
+            <a href="#">Terms of Service</a> and our <a href="#">Privacy Policy</a>.
+          </label>
+        </div>
+
+        <button type="submit">Create Account</button>
+      </form>
+
+      <div class="login-link">
+        Already have an account? <a href="{% url 'login' %}">Login</a>
+      </div>
+    </div>
+
+    <div class="illustration-section">
+      <img src="/static/images/Illustration.png" alt="Illustration">
+    </div>
+  </div>
+</body>
+</html>
