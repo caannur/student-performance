@@ -6,11 +6,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=prediction_db
-      - POSTGRES_USER=prediction_user
-      - POSTGRES_PASSWORD=prediction_password
+      - POSTGRES_DB=railway
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=crpbhiohpqhkiUVvnogACyLdeCtpUUad
     ports:
-      - "5432:5432"
+      - "3306:3306"
 
   web:
     build: .
@@ -25,13 +25,13 @@ services:
       - db
     environment:
       - DEBUG=1  # Для отладки
-      - DATABASE=postgres
-      - SQL_ENGINE=django.db.backends.postgresql
-      - SQL_DATABASE=prediction_db
-      - SQL_USER=prediction_user
-      - SQL_PASSWORD=prediction_password
-      - SQL_HOST=db
-      - SQL_PORT=5432
+      - DATABASE=railway
+      - SQL_ENGINE=django.db.backends.mysql
+      - SQL_DATABASE=railway
+      - SQL_USER=root
+      - SQL_PASSWORD=crpbhiohpqhkiUVvnogACyLdeCtpUUad
+      - SQL_HOST=mysql.railway.internal
+      - SQL_PORT=3306
 
   nginx:
     image: nginx:1.21
